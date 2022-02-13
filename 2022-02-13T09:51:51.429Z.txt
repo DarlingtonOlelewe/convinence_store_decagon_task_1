@@ -1,0 +1,16 @@
+===== Thanks for patronizingEasy Buy ========
+Transaction Details
+=============================================
+Product Name: Beer
+Price       : 500.0
+Units       : 3
+Cost        : 1500.0
+=============================================
+Product Name: diapers
+Price       : 2000.0
+Units       : 40
+Cost        : 80000.0
+=============================================
+Total Price: 81500.0
+Balance    : 118500.0
+Validated by James John
