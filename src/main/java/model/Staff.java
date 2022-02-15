@@ -18,6 +18,7 @@ public class Staff extends Person{
     private final String ID;
     private String storeName;
     private static int count = 0;
+    private double customersCostOfGoods;
 
     public Staff(String firstName, String lastName, String Email, Gender gender, Role role) {
         super(firstName, lastName, Email, gender);
@@ -115,7 +116,7 @@ public class Staff extends Person{
 
 
             if (customer.getPriceOfGoods() <= payment){
-
+                customersCostOfGoods = customer.getPriceOfGoods();
                 double balance = payment - customer.getPriceOfGoods();
 
                 checkOut(customer.viewCartMap(), store);
@@ -126,6 +127,10 @@ public class Staff extends Person{
             }else throw new InsufficientFund("Insufficient Funds");
         }
 
+    }
+
+    public double getCustomersCostOfGoods(){
+        return customersCostOfGoods;
     }
 
     private void checkOut(Map<Product, Integer> cartMap, Store store){

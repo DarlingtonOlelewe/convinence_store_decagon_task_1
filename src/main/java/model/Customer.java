@@ -12,7 +12,6 @@ public class Customer extends Person{
 
 
 
-    private double cost = 0;
 
     public Customer(String firstName, String lastName, String Email, Gender gender) {
         super(firstName, lastName, Email, gender);
@@ -33,6 +32,7 @@ public class Customer extends Person{
     }
 
     public double getPriceOfGoods(){
+        int cost = 0;
         for( Map.Entry<Product, Integer> customerGoods: cartMap.entrySet()){
                 cost += (customerGoods.getKey().getPrice() * (double) customerGoods.getValue());
         }

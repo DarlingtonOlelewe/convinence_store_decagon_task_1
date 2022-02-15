@@ -15,37 +15,16 @@ public class Main {
     public static void main(String[] args) throws IOException, NotEnoughtInStock, UnAuthorizedAccess, NotOwners, ApplicantAlreadyExist, InsufficientFund {
 
         Staff cas= new Staff("uc", "da", ".com",Gender.MALE,Role.CASHIER);
-
-//        Store ja = new Store("Ja Stores", cas);
-//        Product m = new Product("Milk", 586);
-//        Product c = new Product ("Car", 89739);
-//        Product j = new Product("Jame", 987);
-
-
-        //A store cannot exist without a Manager. reason why I had to create one first.
-        //Any other staff have to apply to get in
         Staff manager = new Staff("Chisom", "Obidike", "decagon.com", Gender.FEMALE, Role.MANAGER);
-
-        //Anyone can have access to applicant form
         Applicants James = new Applicants("James", "John", "John.com", Gender.MALE,Role.CASHIER, Qualifications.SSCE);
-
-        //Store Is created alongside having a manager and no other Staff. Staff list increases
         Store easyBuy = new Store("Easy Buy",manager);
         System.out.println(easyBuy.getStaffList());
-
-
-        //James tenders application to EasyBuy store
         easyBuy.apply(James);
-//        easyBuy.apply(James);
-
-        //Manager.hires cashier since he applied to easyBuy.
-        //This happens based on the fact that the applicant has SSCE or HND.
-        //He is now converted into a staff, here. He cannot be assesed with his Applicant Instance.
         manager.hireCashier(easyBuy);
-
-        //He is removed from the applicantlist, subsequently added to Stafflist at Index 1
         System.out.println(easyBuy.getApplicantsList().size());
         System.out.println(easyBuy.getStaffList());
+
+
 
 
         //Products are created at will but are put into a store instance by the manager of the store.
@@ -53,6 +32,20 @@ public class Main {
         Product product2 = new Product("Beer", 500);
         manager.addProductsToStore(product1, 400, easyBuy);
         manager.addProductsToStore(product2, 7000, easyBuy);
+
+        Product product3 = new Product("Infinix", 40_000);
+        Product product4 = new Product("Air", 120_000);
+        manager.addProductsToStore(product3, 30, easyBuy);
+        manager.addProductsToStore(product4, 7, easyBuy);
+
+
+        Customer ife = new Customer("Ifeoluwa", "Abel", "ife@gmail.com", Gender.MALE);
+        ife.buyProducts("Infinix", 2, easyBuy);
+        ife.buyProducts("Air", 1, easyBuy);
+
+        System.out.println(easyBuy.getProductMap());
+
+
 
 
         //Customers can access stores (any store Instance) at will, but must be created.
@@ -85,6 +78,7 @@ public class Main {
         //for James to sell product to Joy, he needs Joy's cart which are in the store, and Payment
         //This enables him to cross-check goods and remove from his store, and generate reciepts
         james.sellProducts(Joy,2000000,easyBuy);
+        james.sellProducts(ife, 200000, easyBuy);
 
         //Products in Store are reduced only when they are paid for
         System.out.println(easyBuy.getProductMap());

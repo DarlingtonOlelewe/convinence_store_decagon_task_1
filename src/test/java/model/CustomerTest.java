@@ -26,48 +26,35 @@ public class CustomerTest {
         product1 = new Product("diapers", 2000);
         product2 = new Product("Beer", 500);
         manager.addProductsToStore(product1, 40, easyBuy);
-        manager.addProductsToStore(product2, 58, easyBuy);
+        manager.addProductsToStore(product2, 5, easyBuy);
         Joy = new Customer("Joy", "Uche", "Joy.com", Gender.FEMALE);
 
-
-        //howEver they can view products. which allows them to know the names of the products
-
-
-
-        //They can view their cart at anytime. and also its amount. this helps them have an estimate of price
-        System.out.println(Joy.viewCartMap());
-        System.out.println();
-
-
-        //Products in store does not reduce even though its on customers cart.
-        //It reduces only when paid for.
-        System.out.println(easyBuy.getProductMap());
-
-        //remeber James (formally an applicant is now a staff and can be accessed through staffList.
-        //basically the company can only one manager and one or more cashiers.
-        //It's a nobrainer in our case to know that our James is the second staff and also a cashier
-        //So he is created from the list not as a new Staff
-        Staff james = easyBuy.getStaffList().get(1);
-
-        //for James to sell product to Joy, he needs Joy's cart which are in the store, and Payment
-        //This enables him to cross-check goods and remove from his store, and generate reciepts
-        james.sellProducts(Joy,200000,easyBuy);
-
-        //Products in Store are reduced only when they are paid for
-        System.out.println(easyBuy.getProductMap());
-
-        System.out.println(Joy);
     }
 
     @Test
     public void buyProducts() throws NotEnoughtInStock {
         Joy.buyProducts("Beer", 3, easyBuy);
-        Joy.buyProducts("sugar", 5, easyBuy);
         Joy.buyProducts("diapers", 40, easyBuy);
+
+        assertEquals(2, Joy.viewCartMap().size());
+
+
     }
 
     @Test
-    public void getPriceOfGoods() {
+    public void shouldReturnNotInStock(){
+        assertThrows(NotEnoughtInStock.class, ()-> {Joy.buyProducts("Beer",6, easyBuy);});
+        assertEquals(0, Joy.viewCartMap().size());
+    }
+
+    @Test
+    public void getPriceOfGoods() throws NotEnoughtInStock {
+        Joy.buyProducts("Beer", 3, easyBuy);
+        Joy.buyProducts("diapers", 40, easyBuy);
+
+        int price = (int) Joy.getPriceOfGoods();
+
+       assertEquals(81500, price);
     }
 
     @Test
