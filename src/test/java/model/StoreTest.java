@@ -4,6 +4,7 @@ import applications.Applicants;
 import enums.Gender;
 import enums.Qualifications;
 import enums.Role;
+import exceptions.ApplicantAlreadyExist;
 import org.junit.Assert;
 
 import static org.junit.Assert.*;
@@ -27,7 +28,7 @@ public class StoreTest {
     }
 
     @org.junit.Test
-    public void getApplicantsList() {
+    public void getApplicantsList() throws ApplicantAlreadyExist {
         James = new Applicants("James", "Peter",
                 "james@gmail.com", Gender.MALE,Role.CASHIER, Qualifications.SSCE);
         easyBuy.apply(James);

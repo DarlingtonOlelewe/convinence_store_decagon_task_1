@@ -1,0 +1,7 @@
+===== Thanks for patronizing Easy Buy ========
+Transaction Details
+=============================================
+Total Price : 0.0
+Balance     : 2000000.0
+Validated by: James John
+Staff ID:   : CASHIER-JJ-4

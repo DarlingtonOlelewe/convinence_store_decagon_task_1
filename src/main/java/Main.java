@@ -2,6 +2,7 @@ import applications.Applicants;
 import enums.Gender;
 import enums.Qualifications;
 import enums.Role;
+import exceptions.*;
 import model.Customer;
 import model.Product;
 import model.Staff;
@@ -11,7 +12,15 @@ import java.io.IOException;
 import java.util.Random;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NotEnoughtInStock, UnAuthorizedAccess, NotOwners, ApplicantAlreadyExist, InsufficientFund {
+
+        Staff cas= new Staff("uc", "da", ".com",Gender.MALE,Role.CASHIER);
+
+//        Store ja = new Store("Ja Stores", cas);
+//        Product m = new Product("Milk", 586);
+//        Product c = new Product ("Car", 89739);
+//        Product j = new Product("Jame", 987);
+
 
         //A store cannot exist without a Manager. reason why I had to create one first.
         //Any other staff have to apply to get in
@@ -27,6 +36,7 @@ public class Main {
 
         //James tenders application to EasyBuy store
         easyBuy.apply(James);
+//        easyBuy.apply(James);
 
         //Manager.hires cashier since he applied to easyBuy.
         //This happens based on the fact that the applicant has SSCE or HND.
@@ -39,10 +49,10 @@ public class Main {
 
 
         //Products are created at will but are put into a store instance by the manager of the store.
-        Product product1 = new Product("diapers", 2000);
+        Product product1 = new Product("diapers", 200);
         Product product2 = new Product("Beer", 500);
-        manager.addProductsToStore(product1, 40, easyBuy);
-        manager.addProductsToStore(product2, 58, easyBuy);
+        manager.addProductsToStore(product1, 400, easyBuy);
+        manager.addProductsToStore(product2, 7000, easyBuy);
 
 
         //Customers can access stores (any store Instance) at will, but must be created.
@@ -51,15 +61,14 @@ public class Main {
         //they buy products using the name of the product,
         //If the product does not exist it is not added to the cart. and does not throw errors.
         Joy.buyProducts("Beer", 3, easyBuy);
-        Joy.buyProducts("sugar", 5, easyBuy);
-        Joy.buyProducts("diapers", 40, easyBuy);
+        Joy.buyProducts("diapers", 4, easyBuy);
 
         //howEver they can view products. which allows them to know the names of the products
         Joy.viewProductsInstore(easyBuy);
 
 
         //They can view their cart at anytime. and also its amount. this helps them have an estimate of price
-        System.out.println(Joy.viewCart());
+        System.out.println(Joy.viewCartMap());
         System.out.println(Joy.getPriceOfGoods());
 
 
@@ -75,12 +84,14 @@ public class Main {
 
         //for James to sell product to Joy, he needs Joy's cart which are in the store, and Payment
         //This enables him to cross-check goods and remove from his store, and generate reciepts
-        james.sellProducts(Joy,200000,easyBuy);
+        james.sellProducts(Joy,2000000,easyBuy);
 
         //Products in Store are reduced only when they are paid for
         System.out.println(easyBuy.getProductMap());
 
         System.out.println(Joy);
+
+
 
     }
 }

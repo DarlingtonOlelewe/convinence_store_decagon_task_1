@@ -8,28 +8,31 @@ import applications.Applicants;
 import enums.Gender;
 import enums.Qualifications;
 import enums.Role;
+import exceptions.InsufficientFund;
+import exceptions.NotAStaff;
+import exceptions.UnAuthorizedAccess;
 
 
-
-
-public class Staff extends Person implements StaffOperationInt{
+public class Staff extends Person{
     private  final Role role;
     private final String ID;
     private String storeName;
-    Random rand = new Random();
+    private static int count = 0;
 
     public Staff(String firstName, String lastName, String Email, Gender gender, Role role) {
         super(firstName, lastName, Email, gender);
         this.role = role;
-        this.ID = ""+role+"-"+firstName.charAt(0)+lastName.charAt(0)+"-"+rand.nextInt(10);
+        this.ID = ""+role+"-"+firstName.charAt(0)+lastName.charAt(0)+"-"+count++;
     }
 
     public Role getRole() {
         return role;
     }
 
-    @Override
-    public void hireCashier(Store store) {
+
+    public void hireCashier(Store store) throws UnAuthorizedAccess{
+
+        if(!getRole().equals(Role.MANAGER)) throw new UnAuthorizedAccess("This is a A role reserved only for Manager");
 
         List<Integer> applicantsToRemove = new ArrayList<>();
 
@@ -44,6 +47,33 @@ public class Staff extends Person implements StaffOperationInt{
             for(int removeApplicant: applicantsToRemove){
                 store.getApplicantsList().remove(store.getApplicantsList().get(removeApplicant));
             }
+    }
+
+    public void fireCashier(Store store, String firstName, String email) throws NotAStaff, UnAuthorizedAccess {
+        List<Integer> staffToFirebyIndex = new ArrayList<>();
+        int i = 0;
+
+        if(!store.getName().equals(storeName)) throw new NotAStaff("Not a Staff of this Store.");
+        if(!getRole().equals(Role.MANAGER)) throw new UnAuthorizedAccess("UnAuthorized Access: reserved for Managers");
+
+
+        for(Staff singlarStaff: store.getStaffList()){
+            if(singlarStaff.getFirstName().equals(firstName) && singlarStaff.getEmail().equals(email) && singlarStaff.getRole().equals(Role.CASHIER)){
+
+                staffToFirebyIndex.add(i);
+
+            }
+        }
+
+
+                for(Integer index: staffToFirebyIndex){
+
+                    store.getStaffList().remove(index);
+                }
+
+
+
+
     }
 
     private void convertToStaff(Applicants applicant, Store store){
@@ -67,49 +97,41 @@ public class Staff extends Person implements StaffOperationInt{
     }
 
 
-    //Only manager can add products to Store, in (product, quantity/unit) pairs
-    @Override
-    public void addProductsToStore(Product product, int units, Store store){
+    public void addProductsToStore(Product product, int units, Store store) throws UnAuthorizedAccess {
         if(!getRole().equals(Role.MANAGER)){
-            System.out.println("You need to be a manager to add to Store");
+            throw new UnAuthorizedAccess("UnAuthorized Access! reserved for managers");
         }else{
             store.getProductMap().put(product, units);
         }
     }
 
-    //Only cashier can sell product to a customer
-    //Cashier go through the customers cart, gets price and cross-checks.
-    @Override
-    public void sellProducts(Customer customer, double payment, Store store) throws IOException {
-        int expectedAmount = 0;
+    public void sellProducts(Customer customer, double payment, Store store) throws IOException, InsufficientFund, UnAuthorizedAccess {
+
 
         if(!getRole().equals(Role.CASHIER)){
-            System.out.println("You cant perform this service");
+            throw new UnAuthorizedAccess("UnAuthorized Access! reserved for cashiers");
         }else{
 
-            for( Map.Entry<Product, Integer> productQuantityPair: customer.viewCart().entrySet()){
-                expectedAmount += (productQuantityPair.getKey().getPrice() * productQuantityPair.getValue());
-            }
 
-            if (expectedAmount <= payment){
 
-                double balance = payment - expectedAmount;
+            if (customer.getPriceOfGoods() <= payment){
 
-                checkOut(customer.viewCart(), store);
-                String receiptInfo = generateReceiptContent(customer.viewCart(), expectedAmount, balance);
+                double balance = payment - customer.getPriceOfGoods();
+
+                checkOut(customer.viewCartMap(), store);
+                String receiptInfo = generateReceiptContent(customer.viewCartMap(), customer.getPriceOfGoods(), balance);
                 printReceipt(receiptInfo);
 
-                customer.viewCart().clear();
-                //customer's cart is cleared because it has been paid for, and receipt generated
-            }
+                customer.viewCartMap().clear();
+            }else throw new InsufficientFund("Insufficient Funds");
         }
 
     }
 
-    private void checkOut(Map<Product, Integer> cart, Store store){
+    private void checkOut(Map<Product, Integer> cartMap, Store store){
         List<Product> productsToRemoveFromStore = new ArrayList<>();
 
-        for(Map.Entry<Product, Integer> productPairsBoughtByCustomer: cart.entrySet()){
+        for(Map.Entry<Product, Integer> productPairsBoughtByCustomer: cartMap.entrySet()){
             String nameOfItem = productPairsBoughtByCustomer.getKey().getName();
             int unit = productPairsBoughtByCustomer.getValue();
 
@@ -122,22 +144,16 @@ public class Staff extends Person implements StaffOperationInt{
                     productsToRemoveFromStore.add(productsInStore.getKey());
                 }
             }
-
         }
-
         for(Product singleProductAndUnit: productsToRemoveFromStore){
             store.getProductMap().remove(singleProductAndUnit);
         }
-
     }
 
-
-    //Product contains names of Customer, goods bought, prices, and Cashier who validates the payment.
     private String generateReceiptContent(Map<Product, Integer> cart, double expectedAmount, double balance){
         StringBuilder receiptContent = new StringBuilder("===== Thanks for patronizing " + storeName + " ========\n" +
                 "Transaction Details\n" +
                 "=============================================\n");
-
         for( Map.Entry<Product, Integer> each: cart.entrySet()){
             receiptContent.append("Product Name: ").append(each.getKey().getName()).append("\n").append("Price       : ").append(each.getKey().getPrice()).append("\n").append("Units       : ").append(each.getValue()).append("\n").append("Cost        : ").append(each.getKey().getPrice() * (double) each.getValue()).append("\n").append("=============================================\n");
         }
@@ -146,13 +162,9 @@ public class Staff extends Person implements StaffOperationInt{
         return receiptContent.toString();
     }
 
-    //
     private void printReceipt(String informationOfReceipt) throws IOException {
-
-        Date now = new Date();
-
-        String fileName = now.toInstant()+".txt";
-        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+        String reciept = "Receipt"+(new Date().toInstant()+"").substring(15, 23)+"txt";
+        BufferedWriter writer = new BufferedWriter(new FileWriter(reciept));
         writer.write(informationOfReceipt);
         writer.close();
     }
