@@ -50,32 +50,6 @@ public class Staff extends Person{
             }
     }
 
-    public void fireCashier(Store store, String firstName, String email) throws NotAStaff, UnAuthorizedAccess {
-        List<Integer> staffToFirebyIndex = new ArrayList<>();
-        int i = 0;
-
-        if(!store.getName().equals(storeName)) throw new NotAStaff("Not a Staff of this Store.");
-        if(!getRole().equals(Role.MANAGER)) throw new UnAuthorizedAccess("UnAuthorized Access: reserved for Managers");
-
-
-        for(Staff singlarStaff: store.getStaffList()){
-            if(singlarStaff.getFirstName().equals(firstName) && singlarStaff.getEmail().equals(email) && singlarStaff.getRole().equals(Role.CASHIER)){
-
-                staffToFirebyIndex.add(i);
-
-            }
-        }
-
-
-                for(Integer index: staffToFirebyIndex){
-
-                    store.getStaffList().remove(index);
-                }
-
-
-
-
-    }
 
     private void convertToStaff(Applicants applicant, Store store){
         Staff newStaff = new Staff(applicant.getFirstName(),

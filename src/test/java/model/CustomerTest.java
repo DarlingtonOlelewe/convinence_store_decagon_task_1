@@ -32,7 +32,7 @@ public class CustomerTest {
     }
 
     @Test
-    public void buyProducts() throws NotEnoughtInStock {
+    public void buyProductsShouldAllowACustomerAddToTheirCart() throws NotEnoughtInStock {
         Joy.buyProducts("Beer", 3, easyBuy);
         Joy.buyProducts("diapers", 40, easyBuy);
 
@@ -48,7 +48,7 @@ public class CustomerTest {
     }
 
     @Test
-    public void getPriceOfGoods() throws NotEnoughtInStock {
+    public void getPriceOfGoodsShouldReturnCostOfGoodsInStore() throws NotEnoughtInStock {
         Joy.buyProducts("Beer", 3, easyBuy);
         Joy.buyProducts("diapers", 40, easyBuy);
 
@@ -58,12 +58,18 @@ public class CustomerTest {
     }
 
     @Test
-    public void viewProductsInstore() {
+    public void viewProductsInstoreShouldGiveTheNumberOfProductInStore() {
+
         Joy.viewProductsInstore(easyBuy);
+        assertEquals(2, easyBuy.getProductMap().size());
     }
 
     @Test
-    public void viewCart() {
-        Joy.getPriceOfGoods();
+    public void viewCartShouldGiveTwo() throws NotEnoughtInStock {
+        Joy.buyProducts("Beer", 3, easyBuy);
+        Joy.buyProducts("diapers", 40, easyBuy);
+
+        assertEquals(2, Joy.viewCartMap().size());
+
     }
 }

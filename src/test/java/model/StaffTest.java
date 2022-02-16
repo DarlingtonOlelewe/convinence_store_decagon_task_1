@@ -4,10 +4,7 @@ import applications.Applicants;
 import enums.Gender;
 import enums.Qualifications;
 import enums.Role;
-import exceptions.ApplicantAlreadyExist;
-import exceptions.InsufficientFund;
-import exceptions.NotEnoughtInStock;
-import exceptions.UnAuthorizedAccess;
+import exceptions.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,15 +25,11 @@ public class StaffTest {
         easyBuy = new Store("Easy Buy",manager);
 
         ife = new Customer("Ifeoluwa", "Wisdom", "ife@outlook.com", Gender.MALE);
-//        System.out.println(easyBuy.getStaffList());
-//        easyBuy.apply(James);
-//        manager.hireCashier(easyBuy);
-//        System.out.println(easyBuy.getApplicantsList().size());
-//        System.out.println(easyBuy.getStaffList());
+
     }
 
     @Test
-    public void hireCashier() throws ApplicantAlreadyExist, UnAuthorizedAccess {
+    public void hireCashier_managerHiresAnApplicant() throws ApplicantAlreadyExist, UnAuthorizedAccess {
         James = new Applicants("James", "John", "John.com", Gender.MALE,Role.CASHIER, Qualifications.SSCE);
         easyBuy.apply(James);
 
@@ -57,27 +50,41 @@ public class StaffTest {
     }
 
     @Test
-    public void fireCashier() {
+    public void shouldThrowUnAuthorizedAccessException() throws ApplicantAlreadyExist, UnAuthorizedAccess, NotEnoughtInStock {
+        James = new Applicants("James", "John", "John.com", Gender.MALE,Role.CASHIER, Qualifications.SSCE);
+        easyBuy.apply(James);
+        manager.hireCashier(easyBuy);
+
+        Staff james = easyBuy.getStaffList().get(1);
+        Product product1 = new Product("Iphone", 200_000);
+
+        assertThrows(UnAuthorizedAccess.class, () -> {james.addProductsToStore(product1, 10, easyBuy);});
+
+        manager.addProductsToStore(product1, 4, easyBuy);
+
+        Customer damilola = new Customer("Dami", "Oluwole", "dami@gmail.com", Gender.MALE);
+        damilola.buyProducts("Iphone", 2, easyBuy);
+
+        assertThrows(UnAuthorizedAccess.class, () -> {manager.sellProducts(damilola, 400_000, easyBuy);});
+
+
+    }
+    @Test
+    public void getStoreNameAssignedToAStaff() throws ApplicantAlreadyExist, UnAuthorizedAccess {
+        James = new Applicants("James", "John", "John.com", Gender.MALE,Role.CASHIER, Qualifications.SSCE);
+        easyBuy.apply(James);
+        manager.hireCashier(easyBuy);
+
+        Staff james = easyBuy.getStaffList().get(1);
+
+        assertEquals("Easy Buy", james.getStoreName());
+
+        assertEquals("Easy Buy", manager.getStoreName());
+
     }
 
-//    @Test
-//    public void setStoreName() throws ApplicantAlreadyExist, UnAuthorizedAccess {
-//        James = new Applicants("James", "John", "John.com", Gender.MALE,Role.CASHIER, Qualifications.SSCE);
-//        easyBuy.apply(James);
-//
-//
-//        manager.hireCashier(easyBuy);
-//
-//
-//
-//    }
-//
-//    @Test
-//    public void getStoreName() {
-//    }
-
     @Test
-    public void addProductsToStore() throws UnAuthorizedAccess {
+    public void addProductsToStoreShouldIncreaseTheStoreProductMap() throws UnAuthorizedAccess {
         assertEquals(0, easyBuy.getProductMap().size());
         Product product1 = new Product("Infinix", 40_000);
         Product product2 = new Product("Air conditioner", 120_000);
@@ -88,7 +95,7 @@ public class StaffTest {
     }
 
     @Test
-    public void sellProducts() throws ApplicantAlreadyExist, UnAuthorizedAccess, NotEnoughtInStock, InsufficientFund, IOException {
+    public void sellProductsShouldPerformABalanceCheckBasedOnPrice() throws ApplicantAlreadyExist, UnAuthorizedAccess, NotEnoughtInStock, InsufficientFund, IOException {
         James = new Applicants("James", "John", "John.com", Gender.MALE,Role.CASHIER, Qualifications.SSCE);
         easyBuy.apply(James);
         manager.hireCashier(easyBuy);
@@ -161,6 +168,17 @@ public class StaffTest {
         ife.clearCartMap();
         assertEquals(0, ife.viewCartMap().size());
 
+    }
+
+    @Test
+    public void testingIfNewStaffIsPresent() throws ApplicantAlreadyExist, UnAuthorizedAccess {
+        James = new Applicants("James", "John", "John.com", Gender.MALE,Role.CASHIER, Qualifications.SSCE);
+        easyBuy.apply(James);
+        manager.hireCashier(easyBuy);
+
+        Staff james = easyBuy.getStaffList().get(1);
+
+        assertTrue("Should assert to True", james.toString().contains("James"));
     }
 
 
